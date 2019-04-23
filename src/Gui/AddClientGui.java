@@ -59,6 +59,8 @@ public class AddClientGui {
         cin = new textField();
         soldInitial = new NumberField();
         s_datePK  = new DatePicker();
+        s_datePK.setPromptText("dd-mm-yyyy");
+        s_datePK.setOnAction(event -> s_datePK.setStyle(null));
 
         //type de compte bancaire
         radioGroup = new ToggleGroup();
@@ -192,6 +194,10 @@ public class AddClientGui {
             test=false;
         }
         if(cin.isEmpty()){
+            test=false;
+        }
+        if(s_datePK.getValue() == null){
+            s_datePK.setStyle("-fx-border-color:red;-fx-border-radius:3px;-fx-border-size: 1px;");
             test=false;
         }
 

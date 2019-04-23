@@ -3,6 +3,7 @@ package Gui;
 import Classes.Agence;
 import Classes.Client;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -18,7 +19,6 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 
 public class ClientListGui extends Application {
@@ -69,8 +69,15 @@ public class ClientListGui extends Application {
 
         final Button removeB = new Button("Supprimer");
         removeB.setOnAction(event->{
-            if(agence.lesClients.size()>0)
-                new RemoveAlertGui(ClientListGui.this);
+            if(agence.lesClients.size()>0){
+                Client client = getSelectedClient();
+                String message = "Vouz voulez supprimer le client "+client.getNom()+" "+client.getPrenom()+" ?";
+                AlertGui alertGui = new AlertGui(message,"Supprimer un Compte");
+                alertGui.yesB.setOnAction(e -> {
+                    removeClient(client);
+                    alertGui.close();
+                });
+            }
         });
 
 
@@ -89,6 +96,16 @@ public class ClientListGui extends Application {
         window.setScene(scene);
         window.setTitle("Gestionnaire d'Agence Bancaire");
         window.show();
+        window.setOnCloseRequest(event->{
+            AlertGui alertGui = new AlertGui("Vous voulez sauvgarder?","Savgarder les Changements");
+            alertGui.createCancelB();
+            alertGui.yesB.setOnAction(e -> {
+                agence.save();
+                alertGui.close();
+                Platform.exit();
+            });
+            event.consume();
+        });
     }
 
     public TableColumn createCol(String colName,int width){
@@ -107,10 +124,6 @@ public class ClientListGui extends Application {
         data.add(client);
     }
 
-    @Override
-    public void stop() throws Exception {
-        agence.save();
-    }
 
     public Client getSelectedClient() {
         return table.getSelectionModel().getSelectedItem();
