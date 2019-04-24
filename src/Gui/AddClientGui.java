@@ -19,6 +19,8 @@ import javafx.util.StringConverter;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class AddClientGui {
     ClientListGui gui;
@@ -117,23 +119,23 @@ public class AddClientGui {
         form.setHgap(20);
 
 
-        form.setConstraints(lnameLabel,0,0);
-        form.setConstraints(lname,1,0);
+        GridPane.setConstraints(lnameLabel, 0, 0);
+        GridPane.setConstraints(lname, 1, 0);
 
-        form.setConstraints(fnameLabel,0,1);
-        form.setConstraints(fname,1,1);
+        GridPane.setConstraints(fnameLabel, 0, 1);
+        GridPane.setConstraints(fname, 1, 1);
 
-        form.setConstraints(cinLabel,0,2);
-        form.setConstraints(cin,1,2);
+        GridPane.setConstraints(cinLabel, 0, 2);
+        GridPane.setConstraints(cin, 1, 2);
 
-        form.setConstraints(dateLabel,0,3);
-        form.setConstraints(s_datePK,1,3);
+        GridPane.setConstraints(dateLabel, 0, 3);
+        GridPane.setConstraints(s_datePK, 1, 3);
 
-        form.setConstraints(typeLabel,0,4);
-        form.setConstraints(radioLayout,1,4,2,1);
+        GridPane.setConstraints(typeLabel, 0, 4);
+        GridPane.setConstraints(radioLayout, 1, 4, 2, 1);
 
-        form.setConstraints(soldLabel,0,5);
-        form.setConstraints(soldInitial,1,5);
+        GridPane.setConstraints(soldLabel, 0, 5);
+        GridPane.setConstraints(soldInitial, 1, 5);
 
         form.getChildren().addAll(lnameLabel, lname, fnameLabel, fname,cinLabel,
                                     cin,dateLabel,s_datePK,typeLabel, radioLayout,soldLabel,soldInitial);
@@ -163,7 +165,46 @@ public class AddClientGui {
 
         Client client = new Client(nom,prenom,CIN,daten);
         client.affecterCompte(getSelectedCompte());
+        client.setMatricule(CreateClientMatricule());
+        client.getCompte().setCode(CreateCompteCode());
         return client;
+    }
+
+    private int CreateClientMatricule() {
+        Random rand = new Random();
+        int newClientMatricule = rand.nextInt(10000);
+
+        while (MatriculeExist(newClientMatricule)) {
+            newClientMatricule = rand.nextInt(10000);
+        }
+        return newClientMatricule;
+
+    }
+
+    private int CreateCompteCode() {
+        Random rand = new Random();
+        int newCompteMatricule = rand.nextInt(10000);
+        boolean found = true;
+        while (found) {
+            found = false;
+            for (Compte compte : gui.agence.lesComptes) {
+                if (compte.getCode() == newCompteMatricule) {
+                    found = true;
+                    newCompteMatricule = rand.nextInt(10000);
+                    break;
+                }
+            }
+        }
+        return newCompteMatricule;
+    }
+
+    private boolean MatriculeExist(int newMatricule) {
+        ArrayList<Client> list = gui.getClientList();
+        for (Client client : list) {
+            if (client.getMatricule() == newMatricule)
+                return true;
+        }
+        return false;
     }
 
     private Compte getSelectedCompte() {

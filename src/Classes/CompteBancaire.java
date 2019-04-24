@@ -16,7 +16,12 @@ public class CompteBancaire extends Compte implements Serializable{
 	public void setDecouvert(float d){
 		decouvert = d;
 	}
-	
+
+	@Override
+	public String getType() {
+		return "Compte Bancaire";
+	}
+
 	public String toString() {
 		return super.toString()+"\n Decouvert: "+decouvert;
 	}

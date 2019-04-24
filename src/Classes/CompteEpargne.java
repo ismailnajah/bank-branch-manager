@@ -22,6 +22,11 @@ public class CompteEpargne extends Compte implements Serializable{
 		solde *= (1+taux/100);
 	}
 
+	@Override
+	public String getType() {
+		return "Compte Epargne";
+	}
+
 	public String toString(){
 		return super.toString()+"\n Taux d'interet: "+taux+"%";
 	}

@@ -1,16 +1,10 @@
 package Classes;
 
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
 import java.io.*;
 import java.util.ArrayList;
 
 public class Agence implements Serializable {
-
-	public Client clientCourant;
-	public Compte compteCourant;
+    public String filePath = "";
 	public ArrayList<Compte> lesComptes;
 	public ArrayList<Client> lesClients;
 	private int code;
@@ -21,6 +15,12 @@ public class Agence implements Serializable {
 		lesClients = new ArrayList();
 		lesComptes = new ArrayList();
 	}
+
+    public Agence() {
+        code = -1;
+        lesClients = new ArrayList();
+        lesComptes = new ArrayList();
+    }
 
 	public void addClient(Client c){
 		lesClients.add(c);
@@ -57,18 +57,14 @@ public class Agence implements Serializable {
 	public void setNom(String nom){
 		nomAgence = nom;
 	}
-	
 
-	public String toString(){
-		return " Code d'Agence: "+code+"\n Nom d'Agence: "+nomAgence+"\n Nombre des Clients: "+lesClients.size()+"\n";
-	}
-
-	public static Agence loadAgence(String name) {
+    public static Agence loadAgence(String path) {
 		Agence agence = null;
 		try {
-			FileInputStream file = new FileInputStream("Agences\\"+name);
+            FileInputStream file = new FileInputStream(path);
 			ObjectInputStream obj = new ObjectInputStream(file);
 			agence = (Agence)obj.readObject();
+            agence.setFilePath(path);
 			obj.close();
 			file.close();
 		}catch(Exception e){
@@ -77,25 +73,22 @@ public class Agence implements Serializable {
 		return agence;
 	}
 
-	public static ArrayList<String> getStoredAgences(String folderName) {
-		ArrayList<String> list = new ArrayList<>();
-		File folder = new File(folderName);
-		if(folder.exists() && folder.isDirectory()) {
-			for (File fileEntry : folder.listFiles()) {
-					list.add(fileEntry.getName());
-			}
-		}
-		return list;
-	}
+    public String getFilePath() {
+        return filePath;
+    }
 
-	public void save() {
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public String toString() {
+        return " Code d'Agence: " + code + "\n Nom d'Agence: " + nomAgence + "\n Nombre des Clients: " + lesClients.size() + "\n";
+    }
+
+    public void save(String path) {
 		try {
-			File folder = new File("Agences");
-			if(!(folder.exists() && folder.isDirectory())) {
-				folder.mkdir();
-			}
-
-			FileOutputStream file = new FileOutputStream("Agences\\"+this.getNom()+"-"+this.getCode());
+            filePath = path;
+            FileOutputStream file = new FileOutputStream(path);
 			ObjectOutputStream obj = new ObjectOutputStream(file);
 			obj.writeObject(this);
 			obj.close();
@@ -108,8 +101,12 @@ public class Agence implements Serializable {
 	}
 
 	public void removeClient(Client client) {
-		System.out.println(client.toString());
 		lesClients.remove(client);
 		lesComptes.remove(client.getCompte());
 	}
+
+    public void setCode(String text) {
+        if (!text.isEmpty())
+            code = Integer.parseInt(text);
+    }
 }

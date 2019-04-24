@@ -18,6 +18,11 @@ public class ComptePayant extends Compte implements Serializable{
 		solde += mt - tauxOperation;
 	}
 
+	@Override
+	public String getType() {
+		return "Compte Payant";
+	}
+
 	public String toString(){
 		return super.toString()+"\n Taux d'operation: "+tauxOperation;
 	}

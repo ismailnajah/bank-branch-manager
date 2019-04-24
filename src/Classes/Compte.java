@@ -11,13 +11,15 @@ public abstract class Compte implements Serializable{
 	
 
 	Compte(){
-		code = ++nbComptes;
+		++nbComptes;
+		code = 0;
 		solde = 0;
 		decouvert = 0;
 	}
 
 	Compte(float soldeInitial){
-		code = ++nbComptes;
+		++nbComptes;
+		code = 0;
 		solde = soldeInitial;
 		decouvert = 0;
 		proprietaire = null;
@@ -28,6 +30,10 @@ public abstract class Compte implements Serializable{
 	public int getCode(){
 		return code;
 	}
+
+	public void setCode(int code) {
+		this.code = code;
+	}
 	public float getDecouvert(){
 		return decouvert;
 	}
@@ -35,11 +41,19 @@ public abstract class Compte implements Serializable{
 	public float getSolde(){
 		return solde;
 	}
+
+	public void setSolde(float solde) {
+		this.solde = solde;
+	}
 	
 	
 	public void setDecouvert(float d){}
 	public void calculInterets(){}
 	public void setTaux(float t){}
+
+	public String getType() {
+		return "Compte";
+	}
 
 	public void retirer(float mt){
 		if(mt<=(solde+decouvert))
