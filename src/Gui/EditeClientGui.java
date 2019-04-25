@@ -1,6 +1,7 @@
 package Gui;
 
 import Classes.Client;
+import Classes.ComptePayant;
 import CustomFx.NumberField;
 import CustomFx.textField;
 import javafx.geometry.Insets;
@@ -27,6 +28,8 @@ import java.time.format.DateTimeFormatter;
 public class EditeClientGui {
     final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     ClientListGui gui;
+
+
     Label lnameLabel = new Label("Nom");
     Label fnameLabel = new Label("Prenom");
     Label cinLabel = new Label("CIN");
@@ -44,15 +47,23 @@ public class EditeClientGui {
     textField fname = new textField();
     textField cin = new textField();
 
+    Label tauxInteretLB = new Label("Taux d'Interet");
+    Label decouvertLB = new Label("Decouvert");
+
+
+    NumberField tauxInteretNF;
+    NumberField decouvertNF;
+
     Label sold = new Label();
 
     Stage window;
     Client client;
-
+    String typeCompte;
     public EditeClientGui(ClientListGui gui) {
         window = new Stage();
         this.gui = gui;
         client = gui.getSelectedClient();
+        typeCompte = client.getCompte().getType();
         s_datePK.setPromptText("dd-mm-yyyy");
         s_datePK.setOnAction(event -> s_datePK.setStyle(null));
 
@@ -79,7 +90,7 @@ public class EditeClientGui {
             }
         });
         //type de compte bancaire
-        type = new Label(client.getCompte().getType());
+        type = new Label("Compte " + typeCompte);
 
         BorderPane footer = new BorderPane();
 
@@ -109,6 +120,7 @@ public class EditeClientGui {
         verserNF.textProperty().addListener((obs, oldText, newText) -> {
             updatePreview(newText, 1);
         });
+
         retirerNF.textProperty().addListener((obs, oldText, newText) -> {
             updatePreview(newText, -1);
         });
@@ -117,7 +129,7 @@ public class EditeClientGui {
             if (!verserNF.isEmpty()) {
                 float verseValue = Float.parseFloat(verserNF.getText());
                 float soldvalue = getSolde();
-                float newSold = soldvalue + verseValue;
+                float newSold = soldvalue + verseValue - tauxOperation();
                 sold.setText(newSold + " Dhs");
                 updatePreview(verserNF.getText(), 1);
             }
@@ -128,7 +140,7 @@ public class EditeClientGui {
                 float retirValue = Float.parseFloat(retirerNF.getText());
                 float soldvalue = getSolde();
                 if (soldvalue + client.getCompte().getDecouvert() > retirValue) {
-                    float newSold = soldvalue - retirValue;
+                    float newSold = soldvalue - retirValue - tauxOperation();
                     sold.setText(newSold + " Dhs");
                     updatePreview(retirerNF.getText(), -1);
                 }
@@ -160,6 +172,7 @@ public class EditeClientGui {
         GridPane.setConstraints(typeLabel, 0, 4);
         GridPane.setConstraints(type, 1, 4, 2, 1);
         form.getChildren().addAll(lnameLabel, lname, fnameLabel, fname, cinLabel, cin, dateLabel, s_datePK, typeLabel, type);
+        createAccountSetting(form);
 
         BorderPane soldBox = new BorderPane();
         soldBox.setPadding(new Insets(0, 0, 30, 20));
@@ -207,8 +220,22 @@ public class EditeClientGui {
         window.show();
     }
 
-    private float getSolde() {
-        return Float.parseFloat(sold.getText().split(" ")[0]);
+    private void createAccountSetting(GridPane form) {
+        tauxInteretNF = new NumberField();
+        decouvertNF = new NumberField();
+        tauxInteretNF.setMaxWidth(70);
+        decouvertNF.setMaxWidth(70);
+        tauxInteretNF.setRegex("\\d{0,2}([\\.]\\d{0,4})?");
+        if (typeCompte.equals("Bancaire")) {
+            decouvertNF.setText(client.getCompte().getDecouvert() + "");
+            GridPane.setConstraints(decouvertLB, 0, 5);
+            GridPane.setConstraints(decouvertNF, 1, 5);
+            form.getChildren().addAll(decouvertLB, decouvertNF);
+        } else if (typeCompte.equals("Epargne")) {
+            GridPane.setConstraints(tauxInteretLB, 0, 5);
+            GridPane.setConstraints(tauxInteretNF, 1, 5);
+            form.getChildren().addAll(tauxInteretLB, tauxInteretNF);
+        }
     }
 
     private void updatePreview(String newValue, int op) {
@@ -219,14 +246,14 @@ public class EditeClientGui {
             float value = Float.parseFloat(newValue);
             float result;
             if (op == -1) {
-                if (soldeVlaue + client.getCompte().getDecouvert() < value) {
+                if (soldeVlaue + Decouvert() < value) {
                     preview.setText("( Solde insuffisant! )");
                 } else {
-                    result = soldeVlaue - value;
+                    result = soldeVlaue - value - tauxOperation();
                     preview.setText("( " + result + " Dhs )");
                 }
             } else {
-                result = soldeVlaue + value;
+                result = soldeVlaue + value - tauxOperation();
                 preview.setText("( " + result + " Dhs )");
             }
         }
@@ -245,6 +272,13 @@ public class EditeClientGui {
         if (cin.isEmpty()) {
             test = false;
         }
+        if (typeCompte.equals("Bancaire")) {
+            if (decouvertNF.isEmpty())
+                test = false;
+        } else if (typeCompte.equals("Epargne")) {
+            if (tauxInteretNF.isEmpty())
+                test = false;
+        }
         if (s_datePK.getValue() == null) {
             s_datePK.setStyle("-fx-border-color:red;-fx-border-radius:3px;-fx-border-size: 1px;");
             test = false;
@@ -259,28 +293,60 @@ public class EditeClientGui {
         String CIN = cin.getText();
         Date date = Date.valueOf(s_datePK.getValue());
         float newSolde = getSolde();
-        boolean saved = false;
+        boolean changed = false;
         if (!client.getNom().equals(nom)) {
             client.setNom(nom);
-            saved = true;
+            changed = true;
         }
         if (!client.getPrenom().equals(prenom)) {
             client.setPrenom(prenom);
-            ClientListGui.ChangeMade = true;
-            saved = true;
+            changed = true;
         }
         if (!client.getCin().equals(CIN)) {
             client.setCin(CIN);
-            saved = true;
+            changed = true;
         }
         if (!client.getDate_naissance().equals(date)) {
             client.setDate_naissance(date);
+            changed = true;
         }
-        if (!(client.getCompte().getSolde() == newSolde)) {
+        if (typeCompte.equals("Bancaire")) {
+            float decouvert = Float.parseFloat(decouvertNF.getText());
+            if (client.getCompte().getDecouvert() != decouvert) {
+                client.getCompte().setDecouvert(decouvert);
+                changed = true;
+            }
+        } else if (typeCompte.equals("Epargne")) {
+            float taux = Float.parseFloat(tauxInteretNF.getText());
+            if (client.getCompte().getTaux() != taux) {
+                client.getCompte().setTaux(Float.parseFloat(tauxInteretNF.getText()));
+                changed = true;
+            }
+        }
+        if (client.getCompte().getSolde() != newSolde) {
             client.getCompte().setSolde(newSolde);
-            saved = true;
+            changed = true;
         }
-        return saved;
+        return changed;
     }
+
+    public float tauxOperation() {
+        if (typeCompte.equals("Payant"))
+            return ComptePayant.tauxOperation;
+        else
+            return 0;
+    }
+
+    private float Decouvert() {
+        float decouvert = 0;
+        if (typeCompte.equals("Bancaire"))
+            decouvert = Float.parseFloat(decouvertNF.getText());
+        return decouvert;
+    }
+
+    private float getSolde() {
+        return Float.parseFloat(sold.getText().split(" ")[0]);
+    }
+
 }
 

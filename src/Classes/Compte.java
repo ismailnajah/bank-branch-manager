@@ -51,6 +51,10 @@ public abstract class Compte implements Serializable{
 	public void calculInterets(){}
 	public void setTaux(float t){}
 
+	public float getTaux() {
+		return 0;
+	}
+
 	public String getType() {
 		return "Compte";
 	}

@@ -20,7 +20,7 @@ public class ComptePayant extends Compte implements Serializable{
 
 	@Override
 	public String getType() {
-		return "Compte Payant";
+		return "Payant";
 	}
 
 	public String toString(){

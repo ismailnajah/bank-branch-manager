@@ -1,5 +1,6 @@
 package Gui;
 
+import Classes.ComptePayant;
 import CustomFx.NumberField;
 import CustomFx.textField;
 import javafx.geometry.Insets;
@@ -21,28 +22,38 @@ public class EditAgenceGui {
     textField nameTF = new textField();
     NumberField codeTF = new NumberField();
     Stage window = new Stage();
+    NumberField tauxOperationNF = new NumberField();
+    Label tauxOperationtLB = new Label("Taux d'Operation(Compte Payant)");
 
     public EditAgenceGui(ClientListGui gui) {
         nombreClient = new Label("Nombre des clients " + gui.agence.lesClients.size());
+        nombreClient.setStyle("-fx-font-weight:bold;-fx-font-size:14");
         GridPane form = new GridPane();
         form.setVgap(20);
         form.setHgap(20);
 
         nameTF.setText(gui.getAgence().getNom());
         codeTF.setText("" + gui.getAgence().getCode());
+        tauxOperationNF.setText("" + ComptePayant.tauxOperation);
+        tauxOperationNF.setMaxWidth(50);
+        tauxOperationNF.setAlignment(Pos.CENTER);
 
         GridPane.setConstraints(nameLabel, 0, 0);
         GridPane.setConstraints(nameTF, 1, 0);
         GridPane.setConstraints(codeLabele, 0, 1);
         GridPane.setConstraints(codeTF, 1, 1);
-        GridPane.setConstraints(nombreClient, 0, 2);
+        GridPane.setConstraints(tauxOperationtLB, 0, 2);
+        GridPane.setConstraints(tauxOperationNF, 1, 2);
+        GridPane.setConstraints(nombreClient, 0, 3);
 
-        form.getChildren().addAll(nameLabel, nameTF, codeLabele, codeTF, nombreClient);
+        form.getChildren().addAll(nameLabel, nameTF, codeLabele, codeTF, tauxOperationtLB, tauxOperationNF, nombreClient);
 
         Button enregistrer = new Button("Enregistrer");
         enregistrer.setOnAction(event -> {
             gui.agence.setNom(nameTF.getText());
             gui.agence.setCode(codeTF.getText());
+            if (!tauxOperationNF.isEmpty())
+                ComptePayant.tauxOperation = Float.parseFloat(tauxOperationNF.getText());
             gui.clientListLabel.setText("Liste des Clients d'Agence " + nameTF.getText());
             gui.header.save.fire();
             window.close();

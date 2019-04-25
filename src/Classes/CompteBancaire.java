@@ -19,7 +19,7 @@ public class CompteBancaire extends Compte implements Serializable{
 
 	@Override
 	public String getType() {
-		return "Compte Bancaire";
+		return "Bancaire";
 	}
 
 	public String toString() {

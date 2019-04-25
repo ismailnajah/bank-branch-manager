@@ -24,7 +24,7 @@ public class CompteEpargne extends Compte implements Serializable{
 
 	@Override
 	public String getType() {
-		return "Compte Epargne";
+		return "Epargne";
 	}
 
 	public String toString(){
