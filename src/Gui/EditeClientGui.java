@@ -25,43 +25,33 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class EditeClientGui {
-    final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-    ClientListGui gui;
+class EditeClientGui {
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
 
-    Label lnameLabel = new Label("Nom");
-    Label fnameLabel = new Label("Prenom");
-    Label cinLabel = new Label("CIN");
-    Label typeLabel = new Label("Type de compte");
-    Label dateLabel = new Label("Date de naissance");
-    Label soldLabel = new Label("Solde");
-    Label type;
-    Label preview = new Label();
-    NumberField verserNF = new NumberField();
-    NumberField retirerNF = new NumberField();
-    Button verserB = new Button("Verser");
-    Button retirerB = new Button("Retirer");
-    DatePicker s_datePK = new DatePicker();
-    textField lname = new textField();
-    textField fname = new textField();
-    textField cin = new textField();
+    private Label preview = new Label();
+    private NumberField verserNF = new NumberField();
+    private NumberField retirerNF = new NumberField();
+    private DatePicker s_datePK = new DatePicker();
+    private textField lname = new textField();
+    private textField fname = new textField();
+    private textField cin = new textField();
 
-    Label tauxInteretLB = new Label("Taux d'Interet");
-    Label decouvertLB = new Label("Decouvert");
+    private Label tauxInteretLB = new Label("Taux d'Interet");
+    private Label decouvertLB = new Label("Decouvert");
 
 
-    NumberField tauxInteretNF;
-    NumberField decouvertNF;
+    private NumberField tauxInteretNF;
+    private NumberField decouvertNF;
 
-    Label sold = new Label();
+    private Label sold = new Label();
 
-    Stage window;
-    Client client;
-    String typeCompte;
-    public EditeClientGui(ClientListGui gui) {
+    private Stage window;
+    private Client client;
+    private String typeCompte;
+
+    EditeClientGui(ClientListGui gui) {
         window = new Stage();
-        this.gui = gui;
         client = gui.getSelectedClient();
         typeCompte = client.getCompte().getType();
         s_datePK.setPromptText("dd-mm-yyyy");
@@ -90,7 +80,7 @@ public class EditeClientGui {
             }
         });
         //type de compte bancaire
-        type = new Label("Compte " + typeCompte);
+        Label type = new Label("Compte " + typeCompte);
 
         BorderPane footer = new BorderPane();
 
@@ -112,18 +102,16 @@ public class EditeClientGui {
         annuler.setOnAction(event -> window.close());
 
 
+        Button verserB = new Button("Verser");
         verserB.setPrefWidth(60);
+        Button retirerB = new Button("Retirer");
         retirerB.setPrefWidth(60);
         verserB.setStyle("-fx-background-color:#45FE32;-fx-font-weight:bold;");
         retirerB.setStyle("-fx-background-color:#FE4532;-fx-font-weight:bold;");
 
-        verserNF.textProperty().addListener((obs, oldText, newText) -> {
-            updatePreview(newText, 1);
-        });
+        verserNF.textProperty().addListener((obs, oldText, newText) -> updatePreview(newText, 1));
 
-        retirerNF.textProperty().addListener((obs, oldText, newText) -> {
-            updatePreview(newText, -1);
-        });
+        retirerNF.textProperty().addListener((obs, oldText, newText) -> updatePreview(newText, -1));
 
         verserB.setOnAction(event -> {
             if (!verserNF.isEmpty()) {
@@ -157,21 +145,26 @@ public class EditeClientGui {
         form.setPadding(new Insets(10, 20, 30, 20));
 
 
-        GridPane.setConstraints(lnameLabel, 0, 0);
-        GridPane.setConstraints(lname, 1, 0);
+        Label lnameLabel = new Label("Nom");
+        form.add(lnameLabel, 0, 0);
+        form.add(lname, 1, 0);
 
-        GridPane.setConstraints(fnameLabel, 0, 1);
-        GridPane.setConstraints(fname, 1, 1);
+        Label fnameLabel = new Label("Prenom");
+        form.add(fnameLabel, 0, 1);
+        form.add(fname, 1, 1);
 
-        GridPane.setConstraints(cinLabel, 0, 2);
-        GridPane.setConstraints(cin, 1, 2);
+        Label cinLabel = new Label("CIN");
+        form.add(cinLabel, 0, 2);
+        form.add(cin, 1, 2);
 
-        GridPane.setConstraints(dateLabel, 0, 3);
-        GridPane.setConstraints(s_datePK, 1, 3);
+        Label dateLabel = new Label("Date de naissance");
+        form.add(dateLabel, 0, 3);
+        form.add(s_datePK, 1, 3);
 
-        GridPane.setConstraints(typeLabel, 0, 4);
-        GridPane.setConstraints(type, 1, 4, 2, 1);
-        form.getChildren().addAll(lnameLabel, lname, fnameLabel, fname, cinLabel, cin, dateLabel, s_datePK, typeLabel, type);
+        Label typeLabel = new Label("Type de compte");
+        form.add(typeLabel, 0, 4);
+        form.add(type, 1, 4, 2, 1);
+
         createAccountSetting(form);
 
         BorderPane soldBox = new BorderPane();
@@ -179,6 +172,7 @@ public class EditeClientGui {
         HBox s = new HBox();
         s.setAlignment(Pos.CENTER_LEFT);
         s.setSpacing(20);
+        Label soldLabel = new Label("Solde");
         s.getChildren().addAll(soldLabel, sold);
         sold.setStyle("-fx-font-weight:bold;-fx-font-size:18");
         preview.setStyle("-fx-font-size:14");
@@ -190,14 +184,13 @@ public class EditeClientGui {
         operationGP.setHgap(20);
         operationGP.setVgap(20);
         operationGP.setAlignment(Pos.CENTER);
-        GridPane.setConstraints(verserNF, 0, 0);
-        GridPane.setConstraints(verserB, 1, 0);
 
-        GridPane.setConstraints(retirerNF, 0, 1);
-        GridPane.setConstraints(retirerB, 1, 1);
+        operationGP.add(verserNF, 0, 0);
+        operationGP.add(verserB, 1, 0);
 
+        operationGP.add(retirerNF, 0, 1);
+        operationGP.add(retirerB, 1, 1);
 
-        operationGP.getChildren().addAll(verserB, verserNF, retirerB, retirerNF);
 
 
         BorderPane soldePanel = new BorderPane();
@@ -228,20 +221,19 @@ public class EditeClientGui {
         tauxInteretNF.setRegex("\\d{0,2}([\\.]\\d{0,4})?");
         if (typeCompte.equals("Bancaire")) {
             decouvertNF.setText(client.getCompte().getDecouvert() + "");
-            GridPane.setConstraints(decouvertLB, 0, 5);
-            GridPane.setConstraints(decouvertNF, 1, 5);
-            form.getChildren().addAll(decouvertLB, decouvertNF);
+            form.add(decouvertLB, 0, 5);
+            form.add(decouvertNF, 1, 5);
         } else if (typeCompte.equals("Epargne")) {
-            GridPane.setConstraints(tauxInteretLB, 0, 5);
-            GridPane.setConstraints(tauxInteretNF, 1, 5);
-            form.getChildren().addAll(tauxInteretLB, tauxInteretNF);
+            tauxInteretNF.setText(client.getCompte().getTaux() + "");
+            form.add(tauxInteretLB, 0, 5);
+            form.add(tauxInteretNF, 1, 5);
         }
     }
 
     private void updatePreview(String newValue, int op) {
         if (newValue.isEmpty()) {
             preview.setText("");
-        } else if (newValue.matches("\\d{0,10}([\\.]\\d{0,4})?")) {
+        } else if (newValue.matches("\\d{0,10}([.]\\d{0,4})?")) {
             float soldeVlaue = getSolde();
             float value = Float.parseFloat(newValue);
             float result;
@@ -260,7 +252,7 @@ public class EditeClientGui {
     }
 
 
-    public boolean checkFields() {
+    private boolean checkFields() {
         //test all text fields and show red boarder if there is an error!
         boolean test = true;
         if (fname.isEmpty()) {
@@ -287,7 +279,7 @@ public class EditeClientGui {
         return test;
     }
 
-    public boolean SaveChanges() {
+    private boolean SaveChanges() {
         String nom = lname.getText();
         String prenom = fname.getText();
         String CIN = cin.getText();
@@ -330,7 +322,7 @@ public class EditeClientGui {
         return changed;
     }
 
-    public float tauxOperation() {
+    private float tauxOperation() {
         if (typeCompte.equals("Payant"))
             return ComptePayant.tauxOperation;
         else

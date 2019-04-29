@@ -19,42 +19,26 @@ import javafx.util.StringConverter;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
 
-public class AddClientGui {
-    ClientListGui gui;
+class AddClientGui {
+    private static HashSet<Integer> codes = new HashSet<>();
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    private DatePicker s_datePK;
+    private textField lname;
+    private textField fname;
+    private textField cin;
+    private NumberField soldInitial;
 
-    Label lnameLabel;
-    Label fnameLabel;
-    Label cinLabel;
-    Label typeLabel;
-    Label dateLabel;
-    Label soldLabel;
+    private RadioButton compteBancaireRB;
+    private RadioButton comptePayantRB;
+    private RadioButton compteEpargneRB;
 
-    DatePicker s_datePK;
-    final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    private Stage window;
 
-    textField lname;
-    textField fname;
-    textField cin;
-    NumberField soldInitial;
-
-    final ToggleGroup radioGroup;
-    RadioButton compteBancaireRB;
-    RadioButton comptePayantRB;
-    RadioButton compteEpargneRB;
-
-    Stage window;
-    public AddClientGui(ClientListGui gui){
+    AddClientGui(ClientListGui gui) {
         window = new Stage();
-        this.gui = gui;
-        lnameLabel = new Label("Nom");
-        fnameLabel = new Label("Prenom");
-        cinLabel = new Label("CIN");
-        typeLabel = new Label("Type de compte");
-        dateLabel = new Label("Date de naissance");
-        soldLabel = new Label("Solde initial");
 
         lname = new textField();
         fname = new textField();
@@ -65,7 +49,7 @@ public class AddClientGui {
         s_datePK.setOnAction(event -> s_datePK.setStyle(null));
 
         //type de compte bancaire
-        radioGroup = new ToggleGroup();
+        ToggleGroup radioGroup = new ToggleGroup();
         compteBancaireRB = new RadioButton("Compte Bancaire");
         compteBancaireRB.setToggleGroup(radioGroup);
         compteBancaireRB.setSelected(true);
@@ -119,26 +103,29 @@ public class AddClientGui {
         form.setHgap(20);
 
 
-        GridPane.setConstraints(lnameLabel, 0, 0);
-        GridPane.setConstraints(lname, 1, 0);
+        Label lnameLabel = new Label("Nom");
+        form.add(lnameLabel, 0, 0);
+        form.add(lname, 1, 0);
 
-        GridPane.setConstraints(fnameLabel, 0, 1);
-        GridPane.setConstraints(fname, 1, 1);
+        Label fnameLabel = new Label("Prenom");
+        form.add(fnameLabel, 0, 1);
+        form.add(fname, 1, 1);
 
-        GridPane.setConstraints(cinLabel, 0, 2);
-        GridPane.setConstraints(cin, 1, 2);
+        Label cinLabel = new Label("CIN");
+        form.add(cinLabel, 0, 2);
+        form.add(cin, 1, 2);
 
-        GridPane.setConstraints(dateLabel, 0, 3);
-        GridPane.setConstraints(s_datePK, 1, 3);
+        Label dateLabel = new Label("Date de naissance");
+        form.add(dateLabel, 0, 3);
+        form.add(s_datePK, 1, 3);
 
-        GridPane.setConstraints(typeLabel, 0, 4);
-        GridPane.setConstraints(radioLayout, 1, 4, 2, 1);
+        Label typeLabel = new Label("Type de compte");
+        form.add(typeLabel, 0, 4);
+        form.add(radioLayout, 1, 4, 2, 1);
 
-        GridPane.setConstraints(soldLabel, 0, 5);
-        GridPane.setConstraints(soldInitial, 1, 5);
-
-        form.getChildren().addAll(lnameLabel, lname, fnameLabel, fname,cinLabel,
-                                    cin,dateLabel,s_datePK,typeLabel, radioLayout,soldLabel,soldInitial);
+        Label soldLabel = new Label("Solde initial");
+        form.add(soldLabel, 0, 5);
+        form.add(soldInitial, 1, 5);
 
 
         VBox sceneLayout = new VBox();
@@ -165,46 +152,19 @@ public class AddClientGui {
 
         Client client = new Client(nom,prenom,CIN,daten);
         client.affecterCompte(getSelectedCompte());
-        client.setMatricule(CreateClientMatricule());
-        client.getCompte().setCode(CreateCompteCode());
+        client.setMatricule(CreateCode());
+        client.getCompte().setCode(CreateCode());
         return client;
     }
 
-    private int CreateClientMatricule() {
+    private int CreateCode() {
         Random rand = new Random();
-        int newClientMatricule = rand.nextInt(10000);
+        int newCode = rand.nextInt(10000);
 
-        while (MatriculeExist(newClientMatricule)) {
-            newClientMatricule = rand.nextInt(10000);
+        while (!codes.add(newCode)) {
+            newCode = rand.nextInt(10000);
         }
-        return newClientMatricule;
-
-    }
-
-    private int CreateCompteCode() {
-        Random rand = new Random();
-        int newCompteMatricule = rand.nextInt(10000);
-        boolean found = true;
-        while (found) {
-            found = false;
-            for (Compte compte : gui.agence.lesComptes) {
-                if (compte.getCode() == newCompteMatricule) {
-                    found = true;
-                    newCompteMatricule = rand.nextInt(10000);
-                    break;
-                }
-            }
-        }
-        return newCompteMatricule;
-    }
-
-    private boolean MatriculeExist(int newMatricule) {
-        ArrayList<Client> list = gui.getClientList();
-        for (Client client : list) {
-            if (client.getMatricule() == newMatricule)
-                return true;
-        }
-        return false;
+        return newCode;
     }
 
     private Compte getSelectedCompte() {
@@ -222,7 +182,7 @@ public class AddClientGui {
         return new CompteBancaire(solde);
     }
 
-    public boolean checkFields(){
+    private boolean checkFields() {
         //test all text fields and show red boarder if there is an error!
         boolean test = true;
         if(!compteBancaireRB.isSelected()){

@@ -9,37 +9,29 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 
-public class menuBar extends VBox {
-    Menu fichierMenu;
-    Menu optionMenu;
-    MenuBar menubar;
-    MenuItem nouveau;
-    MenuItem openSave;
+class menuBar extends VBox {
     MenuItem save;
-    MenuItem saveAs;
-    MenuItem exit;
+    MenuItem openSave;
     MenuItem editeAgence;
-    MenuItem about;
+    private ClientListGui gui;
 
-    ClientListGui gui;
-
-    public menuBar(ClientListGui gui) {
+    menuBar(ClientListGui gui) {
         super();
         this.gui = gui;
         // create a fichierMenu
-        fichierMenu = new Menu("Fichier");
-        optionMenu = new Menu("Option");
+        Menu fichierMenu = new Menu("Fichier");
+        Menu optionMenu = new Menu("Option");
         // create a menubar
-        menubar = new MenuBar();
+        MenuBar menubar = new MenuBar();
 
         // create menuitems
-        nouveau = new MenuItem("Nouveau");
+        MenuItem nouveau = new MenuItem("Nouveau");
         openSave = new MenuItem("Ouvrir...");
         save = new MenuItem("Enregistrer");
-        saveAs = new MenuItem("Enregistrer sous...");
-        exit = new MenuItem("Quiter");
+        MenuItem saveAs = new MenuItem("Enregistrer sous...");
+        MenuItem exit = new MenuItem("Quiter");
         editeAgence = new MenuItem("Modifier");
-        about = new MenuItem("À propos");
+        MenuItem about = new MenuItem("À propos");
 
         // add fichierMenu items to fichierMenu
         fichierMenu.getItems().add(nouveau);
@@ -105,9 +97,7 @@ public class menuBar extends VBox {
             }
         });
 
-        saveAs.setOnAction(event -> {
-            gui.isSaved(fileChooserSave());
-        });
+        saveAs.setOnAction(event -> gui.isSaved(fileChooserSave()));
 
         exit.setOnAction(event -> gui.Leave());
 
@@ -115,7 +105,7 @@ public class menuBar extends VBox {
 
     }
 
-    public boolean fileChooserSave() {
+    private boolean fileChooserSave() {
         FileChooser fileChooser = new FileChooser();
 
         //Set extension filter for Save files
@@ -134,7 +124,7 @@ public class menuBar extends VBox {
         return false;
     }
 
-    public void fileChooserOpen() {
+    private void fileChooserOpen() {
         FileChooser fileChooser = new FileChooser();
 
         //Set extension filter for Save files
@@ -146,6 +136,7 @@ public class menuBar extends VBox {
 
         if (file != null) {
             gui.setAgence(Agence.loadAgence(file.getAbsolutePath()));
+            System.out.println(gui.getAgence().lesComptes.size());
             gui.updateTitle(file.getName());
             gui.clientListLabel.setText("Liste des Clients d'Agence " + gui.agence.getNom());
         }

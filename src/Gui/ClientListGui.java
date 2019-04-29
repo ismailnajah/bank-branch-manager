@@ -2,7 +2,6 @@ package Gui;
 
 import Classes.Agence;
 import Classes.Client;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,35 +18,26 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
 
-
-public class ClientListGui extends Application {
-    public static boolean ChangeMade = false;
-    public Agence agence;
+class ClientListGui {
+    static boolean ChangeMade = false;
+    Agence agence;
     private TableView<Client> table = new TableView();
     private ObservableList<Client> data;
-    public String SaveFileName;
-    public Stage window;
+    Stage window;
+    private String SaveFileName;
     Label clientListLabel;
     menuBar header;
     private String windowTitle;
 
-    public static void main(String[] args) {
-        launch(args);
-    }
 
-    @Override
-    public void init() throws Exception {
-        agence = new Agence();
+    ClientListGui(Stage primaryStage, Agence agence) {
+        window = primaryStage;
+        this.agence = agence;
         data  = FXCollections.observableArrayList(agence.lesClients);
         windowTitle = "Gestionnaire d'Agence Bancaire : ";
         SaveFileName = "Nouveau.sv";
-    }
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        window = primaryStage;
         clientListLabel = new Label("Liste des Clients d'Agence ");
         clientListLabel.setFont(new Font(20));
 
@@ -68,14 +58,15 @@ public class ClientListGui extends Application {
 
         final Button addB = new Button("Ajouter");
         addB.setFont(Font.font("Arial", FontWeight.BOLD, 15));
-        addB.setOnAction(event->{
-            new AddClientGui(ClientListGui.this);
-        });
+        addB.setOnAction(event -> new AddClientGui(ClientListGui.this));
 
         final Button removeB = new Button("Supprimer");
         removeB.setFont(Font.font("Arial", FontWeight.BOLD, 15));
         removeB.setOnAction(event->{
-            if(agence.lesClients.size()>0){
+            System.out.println("delete : " + getAgence().lesClients.size());
+
+            if (getAgence().lesClients.size() > 0) {
+
                 Client client = getSelectedClient();
                 String message = "Vouz voulez supprimer le client "+client.getNom()+" "+client.getPrenom()+" ?";
                 AlertGui alertGui = new AlertGui(message,"Supprimer un Compte");
@@ -105,13 +96,14 @@ public class ClientListGui extends Application {
         window.setScene(scene);
         window.setTitle(windowTitle + SaveFileName + "(non enregistrer)");
         window.show();
+        header.editeAgence.fire();
         window.setOnCloseRequest(event->{
             Leave();
             event.consume();
         });
     }
 
-    public TableColumn createCol(String colName,int width){
+    private TableColumn createCol(String colName, int width) {
         TableColumn col = new TableColumn(colName);
         col.setMinWidth(width);
         col.setCellValueFactory(new PropertyValueFactory<Client, String>(colName.toLowerCase()));
@@ -121,38 +113,34 @@ public class ClientListGui extends Application {
         return col;
     }
 
-    public void addClient(Client client) {
+    void addClient(Client client) {
         agence.addClient(client);
         data.add(client);
         isSaved(false);
     }
 
 
-    public Client getSelectedClient() {
+    Client getSelectedClient() {
         return table.getSelectionModel().getSelectedItem();
     }
 
-    public void removeClient(Client client) {
+    private void removeClient(Client client) {
         table.getItems().remove(client);
         isSaved(false);
-        agence.removeClient(client);
+        getAgence().removeClient(client);
     }
 
-    public ArrayList<Client> getClientList() {
-        return agence.lesClients;
-    }
-
-    public Agence getAgence() {
+    Agence getAgence() {
         return agence;
     }
 
-    public void setAgence(Agence agence) {
+    void setAgence(Agence agence) {
         this.agence = agence;
         data = FXCollections.observableArrayList(agence.lesClients);
         table.setItems(data);
     }
 
-    public void isSaved(boolean value) {
+    void isSaved(boolean value) {
         String title;
         if (!value) {
             title = windowTitle + SaveFileName + "(non enregistrer)";
@@ -163,12 +151,12 @@ public class ClientListGui extends Application {
         ChangeMade = !value;
     }
 
-    public void Leave() {
+    void Leave() {
         if (ChangeMade) {
             AlertGui alertGui = new AlertGui("Vous voulez enregistrer les modificaions?", "Enregistrer");
             alertGui.createCancelB();
             alertGui.yesB.setOnAction(e -> {
-                agence.save(agence.filePath);
+                header.save.fire();
                 alertGui.close();
                 Platform.exit();
             });
@@ -181,24 +169,24 @@ public class ClientListGui extends Application {
         }
     }
 
-    public void updateTitle(String name) {
+    void updateTitle(String name) {
         window.setTitle(windowTitle + name);
         SaveFileName = name;
     }
 
-    public void newAgence() {
+    void newAgence() {
         setAgence(new Agence());
         SaveFileName = "Nouveau.sv";
         clientListLabel.setText("Liste des Clients d'Agence ");
         updateTitle(SaveFileName);
     }
 
-    public void editAgence() {
+    void editAgence() {
         new EditAgenceGui(this);
     }
 
-    public void updateTable() {
-        data.removeAll(data);
+    void updateTable() {
+        data.clear();
         data.addAll(agence.lesClients);
     }
 }

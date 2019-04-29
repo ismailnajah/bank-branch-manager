@@ -8,6 +8,7 @@ public class CompteEpargne extends Compte implements Serializable{
 
 	public CompteEpargne(float soldeInitial){
 		super(soldeInitial);
+        taux = 0;
 	}
 
 	public float getTaux(){

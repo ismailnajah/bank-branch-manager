@@ -15,18 +15,18 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 
-public class EditAgenceGui {
-    Label nameLabel = new Label("Nom d'Agence");
-    Label codeLabele = new Label("Code d'Agence");
-    Label nombreClient;
-    textField nameTF = new textField();
-    NumberField codeTF = new NumberField();
-    Stage window = new Stage();
-    NumberField tauxOperationNF = new NumberField();
-    Label tauxOperationtLB = new Label("Taux d'Operation(Compte Payant)");
+class EditAgenceGui {
+    private textField nameTF = new textField();
+    private NumberField codeTF = new NumberField();
+    private Stage window = new Stage();
+    private NumberField tauxOperationNF = new NumberField();
 
-    public EditAgenceGui(ClientListGui gui) {
-        nombreClient = new Label("Nombre des clients " + gui.agence.lesClients.size());
+    EditAgenceGui(ClientListGui gui) {
+        Label codeLabele = new Label("Code d'Agence");
+        Label nameLabel = new Label("Nom d'Agence");
+        Label tauxOperationtLB = new Label("Taux d'Operation(Compte Payant)");
+
+        Label nombreClient = new Label("Nombre des clients " + gui.agence.lesClients.size());
         nombreClient.setStyle("-fx-font-weight:bold;-fx-font-size:14");
         GridPane form = new GridPane();
         form.setVgap(20);
@@ -38,25 +38,26 @@ public class EditAgenceGui {
         tauxOperationNF.setMaxWidth(50);
         tauxOperationNF.setAlignment(Pos.CENTER);
 
-        GridPane.setConstraints(nameLabel, 0, 0);
-        GridPane.setConstraints(nameTF, 1, 0);
-        GridPane.setConstraints(codeLabele, 0, 1);
-        GridPane.setConstraints(codeTF, 1, 1);
-        GridPane.setConstraints(tauxOperationtLB, 0, 2);
-        GridPane.setConstraints(tauxOperationNF, 1, 2);
-        GridPane.setConstraints(nombreClient, 0, 3);
 
-        form.getChildren().addAll(nameLabel, nameTF, codeLabele, codeTF, tauxOperationtLB, tauxOperationNF, nombreClient);
+        form.add(nameLabel, 0, 0);
+        form.add(nameTF, 1, 0);
+        form.add(codeLabele, 0, 1);
+        form.add(codeTF, 1, 1);
+        form.add(tauxOperationtLB, 0, 2);
+        form.add(tauxOperationNF, 1, 2);
+        form.add(nombreClient, 0, 3);
 
         Button enregistrer = new Button("Enregistrer");
         enregistrer.setOnAction(event -> {
-            gui.agence.setNom(nameTF.getText());
-            gui.agence.setCode(codeTF.getText());
-            if (!tauxOperationNF.isEmpty())
-                ComptePayant.tauxOperation = Float.parseFloat(tauxOperationNF.getText());
-            gui.clientListLabel.setText("Liste des Clients d'Agence " + nameTF.getText());
-            gui.header.save.fire();
-            window.close();
+            if (checkFields()) {
+                gui.agence.setNom(nameTF.getText());
+                gui.agence.setCode(codeTF.getText());
+                if (!tauxOperationNF.isEmpty())
+                    ComptePayant.tauxOperation = Float.parseFloat(tauxOperationNF.getText());
+                gui.clientListLabel.setText("Liste des Clients d'Agence " + nameTF.getText());
+                gui.header.save.fire();
+                window.close();
+            }
         });
 
 
@@ -78,5 +79,19 @@ public class EditAgenceGui {
         window.setTitle("Parametres Agence");
         window.setResizable(false);
         window.show();
+    }
+
+    private boolean checkFields() {
+        //test all text fields and show red boarder if there is an error!
+        boolean test = true;
+        if (nameTF.isEmpty())
+            test = false;
+        if (tauxOperationNF.isEmpty())
+            test = false;
+
+        if (codeTF.isEmpty())
+            test = false;
+
+        return test;
     }
 }

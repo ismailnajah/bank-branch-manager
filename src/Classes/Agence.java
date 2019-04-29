@@ -8,7 +8,7 @@ public class Agence implements Serializable {
 	public ArrayList<Compte> lesComptes;
 	public ArrayList<Client> lesClients;
 	private int code;
-	private String nomAgence;
+    private String nomAgence = "";
 
 	public Agence(int _code){
 		code = _code;
@@ -25,27 +25,6 @@ public class Agence implements Serializable {
 	public void addClient(Client c){
 		lesClients.add(c);
 		lesComptes.add(c.getCompte());
-	}
-
-	public void addCompte(Compte cpte){
-		lesComptes.add(cpte);
-		lesClients.add(cpte.getProprietaire());
-	}
-
-	public Compte getCompte(int code){
-		for(int i=0 ; i < lesComptes.size() ; i++ ){
-			if(lesComptes.get(i).getCode() == code)
-				return lesComptes.get(i);
-		}
-		return null;
-	}
-	
-	public Client getClient(String CIN) {
-		for(Client c : lesClients) {
-			if(c.getCin().toUpperCase().equals(CIN.toUpperCase()))
-				return c;
-		}
-		return null;
 	}
 
 	public String getNom(){
@@ -73,11 +52,7 @@ public class Agence implements Serializable {
 		return agence;
 	}
 
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
+    private void setFilePath(String filePath) {
         this.filePath = filePath;
     }
 
