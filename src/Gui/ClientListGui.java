@@ -96,7 +96,6 @@ class ClientListGui {
         window.setScene(scene);
         window.setTitle(windowTitle + SaveFileName + "(non enregistrer)");
         window.show();
-        header.editeAgence.fire();
         window.setOnCloseRequest(event->{
             Leave();
             event.consume();

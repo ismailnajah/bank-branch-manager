@@ -57,7 +57,11 @@ public class MainWindow extends Application {
         layout.setTop(header);
         layout.setBottom(footer);
 
-        newAgenceB.setOnAction(even -> new ClientListGui(primaryStage, new Agence()));
+        newAgenceB.setOnAction(even -> {
+            ClientListGui gui = new ClientListGui(primaryStage, new Agence());
+            gui.header.editeAgence.fire();
+        });
+
         importeAgenceB.setOnAction(event -> {
             ClientListGui gui = new ClientListGui(primaryStage, new Agence());
             gui.header.openSave.fire();

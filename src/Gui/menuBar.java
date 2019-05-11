@@ -97,6 +97,8 @@ class menuBar extends VBox {
             }
         });
 
+        about.setOnAction(e -> new AboutGui());
+
         saveAs.setOnAction(event -> gui.isSaved(fileChooserSave()));
 
         exit.setOnAction(event -> gui.Leave());
